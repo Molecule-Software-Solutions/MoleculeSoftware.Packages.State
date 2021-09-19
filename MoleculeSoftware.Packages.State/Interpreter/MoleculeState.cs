@@ -65,7 +65,7 @@ namespace MoleculeSoftware.Packages.State
                         }
                     case "PURGE":
                         {
-                            if (PurgeData(parseData[2]))
+                            if (PurgeData(parseData[4]))
                             {
                                 return "#OK#";
                             }
