@@ -65,11 +65,14 @@ namespace MoleculeSoftware.Packages.State
                         }
                     case "PURGE":
                         {
-                            if (PurgeData(parseData[4]))
+                            if(parseData[1] == "1")
                             {
-                                return "#OK#";
+                                if (PurgeData())
+                                {
+                                    return "#OK#";
+                                }
+                                else return "#NONE#"; 
                             }
-                            else return "#NONE#"; 
                         }
                     default:
                         return "#NONE#";
@@ -108,31 +111,27 @@ namespace MoleculeSoftware.Packages.State
 
         private bool PurgeData(string verifier)
         {
-            if (verifier == "1")
+            try
             {
-                try
+                using (LibraryContext context = new LibraryContext())
                 {
-                    using (LibraryContext context = new LibraryContext())
+                    using (IDbContextTransaction transaction = context.Database.BeginTransaction())
                     {
-                        using (IDbContextTransaction transaction = context.Database.BeginTransaction())
+                        List<CacheItem> itemsList = new List<CacheItem>(context.CacheItems);
+                        foreach (CacheItem item in itemsList)
                         {
-                            List<CacheItem> itemsList = new List<CacheItem>(context.CacheItems);
-                            foreach (CacheItem item in itemsList)
-                            {
-                                context.Remove(item);
-                            }
-                            context.SaveChanges();
-                            transaction.Commit();
-                            return true;
+                            context.Remove(item);
                         }
+                        context.SaveChanges();
+                        transaction.Commit();
+                        return true;
                     }
                 }
-                catch (Exception)
-                {
-                    return false;
-                }
             }
-            else return false; 
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         private bool DeleteValue(string key)
