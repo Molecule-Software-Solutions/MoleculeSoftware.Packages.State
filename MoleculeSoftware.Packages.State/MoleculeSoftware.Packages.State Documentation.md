@@ -4,23 +4,21 @@
 
 ### What is State
 
-State is an in-memory caching system for MoleculeSoftware software packages. It utilizes an SQLite in-memory database to create a pseudo NO-SQL data store which is entirely managed in the background. State does not store any data on physical media. 
-
-### What State is not good at
-
-Storing persistent data. 
-
-State should only be used by components that can set and retrieve predefined keys. Users should not be able to define key names by input. 
-
-State is an in-memory solution and should be treated with care to prevent bloat or excessive memory usage. 
+State is a simple and robust caching system for MoleculeSoftware software packages. It utilizes a SQLite database to create a pseudo NO-SQL data store which accepts simple commands to perform storage, update, delete, retrieval, and purge operations.  
 
 ### Commands 
 
-The state manager creates an in memory database that can store and retrieve key/value pairs containing specified data types. Passing commands into the command parser will allow you to perform set, retrieve, delete, and purge operations with ease. In order to pass commands we need to understand the format of the command string
+The state manager creates a database that can store and retrieve key/value pairs. 
+
+Commands are passed into the state manager using the MoleculeStoate object's DatabaseOperation method.
+
+The database operation method will provide a callback for all commands
+
+The command structure is as follows:
 
 ### The initiator
 
-The initiator is the first part of the command string which instructs State to perform a particular function. We will begin function strings in several ways
+The initiator is the first part of the command string which instructs State to perform a particular function. We will begin command strings in several ways
 
 * STORE#> - instructs State to store a new value
 * RETRIEVE#> - Retrieves a value
@@ -30,11 +28,24 @@ The initiator is the first part of the command string which instructs State to p
 
 ### Command parameters
 
+The command parameter is the second part of the command string. This parameter typically contains the name of the key, but is also uded as a command verifier for the purge command
+The initiator will be combined with a command parameter as follows:
+
 * STORE#> will accept a key as a the first parameter. This command will appear as: STORE#>KEY_NAME
 * RETRIEVE#> will accept a key as the first parameter. This command will appear as: RETRIEVE#>KEY_NAME
 * UPDATE#> Will accept a key as the first parameter. This command will appear as: UPDATE#>KEY_NAME
 * DELETE#> will accept a key as the first parameter. This command will appear as: DELETE#>KEY_NAME
 * PURGE#> will accept a verifier as the first parameter. This command will appear as: PURGE#>1 - Note that unless the verifier is passed, purge will not occur
+
+### Value Parameters
+
+Value parameters follow the command parameter and will contain the value that you want to store/update
+Only the STORE and UPDATE commands require a value parameter
+
+STORE#>KEY_NAME#>VALUE
+UPDATE#>KEY_NAME#>VALUE
+
+VALUE = String representation of the value you wish to store
 
 ### Data Types
 
@@ -110,3 +121,7 @@ Create a MoleculeState object and call the DatabaseOperation method. Pass the co
 ## Cleanup
 
 State will clean up after itself during each application startup. If you wish to delete the state data at application exit, just delete the MoleculeStateData.db file from the user's temporary director. 
+
+## Contribution
+
+If you wish to contribute to this library, please feel free. This was a quick project but has been a very valuable state storage system for MoleculeSoftware applications. Adaptations and updates are welcome. 
