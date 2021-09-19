@@ -65,14 +65,15 @@ namespace MoleculeSoftware.Packages.State
                         }
                     case "PURGE":
                         {
-                            if(parseData[1] == "1")
+                            if (parseData[1] == "1")
                             {
                                 if (PurgeData())
                                 {
                                     return "#OK#";
                                 }
-                                else return "#NONE#"; 
+                                else return "#NONE#";
                             }
+                            else return "#NONE#"; 
                         }
                     default:
                         return "#NONE#";
@@ -109,7 +110,7 @@ namespace MoleculeSoftware.Packages.State
             }
         }
 
-        private bool PurgeData(string verifier)
+        private bool PurgeData()
         {
             try
             {
