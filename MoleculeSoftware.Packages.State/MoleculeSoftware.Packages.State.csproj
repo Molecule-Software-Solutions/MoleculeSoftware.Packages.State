@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <AssemblyVersion>1.0.0.7</AssemblyVersion>
+    <AssemblyVersion>1.0.0.8</AssemblyVersion>
     <Description>Simple state storage for MoleculeSoftware applications. Note: While this package is available for public use, it is designed for a specific use case within MoleculeSoftware applications. See github listing for documentation</Description>
     <Copyright>2021 Molecule Software Solutions</Copyright>
     <PackageReleaseNotes>Initial Release for .NET 5 projects</PackageReleaseNotes>
-    <Version>1.0.0.7</Version>
+    <Version>1.0.0</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <RepositoryUrl>github.com/joshman1019/MoleculeSoftware.Packages.State</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
