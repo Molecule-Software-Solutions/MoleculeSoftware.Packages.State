@@ -28,7 +28,7 @@ The initiator is the first part of the command string which instructs State to p
 
 ### Command parameters
 
-The command parameter is the second part of the command string. This parameter typically contains the name of the key, but is also uded as a command verifier for the purge command
+The command parameter is the second part of the command string. This parameter typically contains the name of the key, but is also used as a command verifier for the purge command
 The initiator will be combined with a command parameter as follows:
 
 * STORE#> will accept a key as a the first parameter. This command will appear as: STORE#>KEY_NAME
@@ -43,6 +43,7 @@ Value parameters follow the command parameter and will contain the value that yo
 Only the STORE and UPDATE commands require a value parameter
 
 STORE#>KEY_NAME#>VALUE
+
 UPDATE#>KEY_NAME#>VALUE
 
 VALUE = String representation of the value you wish to store
