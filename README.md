@@ -110,6 +110,13 @@ Install the nuget package MoleculeSoftware.Packages.State
 
 When your application that will be using State has started, create a MoleculeState object and call the Init() method. This will delete any existing state database and will perform any migrations that are necessary to set up the database file. The database file is stored in the temporary directory using the name MoelculeStateData.db
 
+* DEFAULT - Init() will set the default database name to MoleculeStateData.db if you do not set the databaseFileName parameter. 
+* RECOMMENDED - Init(databaseFileName) - the databaseFileName can be set to give the caching database a unique name. This is especially helpful if you have multiple applications running that are using the caching system. It is recommended to set this name so that it is unique to your application, otherwise applications may share, and damage, the caching database from other applications. The default value is only assigned as a safety measure and ensures that some form of a properly named database is created on init. 
+
+You should create a SINGLE INSTANCE of the MoleculeState object and share that throughout your application. Once MoleculeState falls out of scope your data will be lost*. 
+
+* It is possible to recover the data from the database as long as Init() has not been called again. This will need to be performed manually with an SQLite supported database manager. NOTE: It is NOT recommended that you store any sensitive data in the state manager. But, once state has retrieved a value it will be removed from the database. This may be better than some other options when dealing with sensitive data. BUT BE WARNED the database is not encrypted so that performance is not degraded. You may wish to pre-encrypt any sensitive data prior to storing it. 
+
 NOTE: If Init() is not called the database will not be created. 
 
 NOTE: If Init() is called elsewhere, the state database will be deleted and recreated. This is not recommended to be used as a purge since database migrations must be applied every time it is called. Although it will work, this can be slower than using the inbuilt PURGE#> command. 
@@ -118,9 +125,17 @@ NOTE: If Init() is called elsewhere, the state database will be deleted and recr
 
 Create a MoleculeState object and call the DatabaseOperation method. Pass the command string as a parameter. This method will return the string result. See the callbacks section for possible results returned. 
 
+*NOTE* it is highly recommended that you create a wrapper around State that can create (and keep consistent) the database operation calls. 
+
 ## Cleanup
 
 State will clean up after itself during each application startup. If you wish to delete the state data at application exit, just delete the MoleculeStateData.db file from the user's temporary director. 
+
+## What can State store
+
+State can store any value in string form, this includes serialized objects. The backing store for State is an SQLite database, which supports BLOB data.
+
+*NOTE* any blob data stored in state after exiting the application will be deleted on the next init. 
 
 ## Contribution
 
