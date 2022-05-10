@@ -7,8 +7,13 @@ namespace MoleculeSoftware.Packages.State
     {
         public string DataSource { get; init; }
 
-        public LibraryContext()
+        public LibraryContext(string dataSource)
         {
+            if(!string.IsNullOrWhiteSpace(dataSource))
+            {
+                DataSource = dataSource;
+                return;
+            }
             DataSource = System.IO.Path.Join(System.IO.Path.GetTempPath(), "MoleculeStateData.db"); 
         }
 

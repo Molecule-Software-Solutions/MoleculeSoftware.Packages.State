@@ -8,6 +8,7 @@ namespace MoleculeSoftware.Packages.State
 {
     public class MoleculeState
     {
+        public string DataSource { get; set; }
         public string DatabaseOperation(string operationString)
         {
             return ParseOperationString(operationString);
@@ -16,9 +17,10 @@ namespace MoleculeSoftware.Packages.State
         /// <summary>
         /// Initializes the database and deletes any existing state database files
         /// </summary>
-        public void Init()
+        public void Init(string? dataSource)
         {
-            LibraryContext context = new LibraryContext();
+            DataSource = dataSource; 
+            LibraryContext context = new LibraryContext(DataSource);
             context.Cleanup(); 
             context.Database.Migrate();
         }
@@ -73,6 +75,7 @@ namespace MoleculeSoftware.Packages.State
                                 }
                                 else return "#NONE#"; 
                             }
+                            else return "#NONE#"; 
                         }
                     default:
                         return "#NONE#";
@@ -86,7 +89,7 @@ namespace MoleculeSoftware.Packages.State
 
         private bool UpdateData(string key, string value)
         {
-            using (LibraryContext context = new LibraryContext())
+            using (LibraryContext context = new LibraryContext(DataSource))
             {
                 using (IDbContextTransaction transaction = context.Database.BeginTransaction())
                 {
@@ -109,11 +112,11 @@ namespace MoleculeSoftware.Packages.State
             }
         }
 
-        private bool PurgeData(string verifier)
+        private bool PurgeData()
         {
             try
             {
-                using (LibraryContext context = new LibraryContext())
+                using (LibraryContext context = new LibraryContext(DataSource))
                 {
                     using (IDbContextTransaction transaction = context.Database.BeginTransaction())
                     {
@@ -142,7 +145,7 @@ namespace MoleculeSoftware.Packages.State
                 return false; 
             }
 
-            using (LibraryContext context = new LibraryContext())
+            using (LibraryContext context = new LibraryContext(DataSource))
             {
                 using (IDbContextTransaction transaction = context.Database.BeginTransaction())
                 {
@@ -174,7 +177,7 @@ namespace MoleculeSoftware.Packages.State
                 return "#NONE#"; 
             }
 
-            using (LibraryContext context = new LibraryContext())
+            using (LibraryContext context = new LibraryContext(DataSource))
             {
                 var result = context.CacheItems.FirstOrDefault(c => c.Key == key);
                 if (result is null)
@@ -189,7 +192,7 @@ namespace MoleculeSoftware.Packages.State
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
                 return false; 
 
-            using (LibraryContext context = new LibraryContext())
+            using (LibraryContext context = new LibraryContext(DataSource))
             {
                 using (IDbContextTransaction transaction = context.Database.BeginTransaction())
                 {
