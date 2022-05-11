@@ -8,19 +8,29 @@ namespace MoleculeSoftware.Packages.State
 {
     public class MoleculeState
     {
+        private const string DEFAULT_DATABASE_NAME = "MoleculeStateData.db";
+        private string m_DatabaseName = string.Empty; 
+        private bool m_Initialized; 
+
         public string DatabaseOperation(string operationString)
         {
+            if (!m_Initialized)
+                throw new Exception("The caching database has not been initialized. You must call the Init()/Init(databaseFileName) method before performing any database operations"); 
             return ParseOperationString(operationString);
         }
 
         /// <summary>
-        /// Initializes the database and deletes any existing state database files
+        /// Initializes the database and ensures that any migrations are performed
+        /// NOTE: Deletes all previous instances of the caching database matching the <see cref="databaseFileName"/>
         /// </summary>
-        public void Init()
+        /// <param name="databaseFileName"></param>
+        public void Init(string databaseFileName = DEFAULT_DATABASE_NAME)
         {
-            LibraryContext context = new LibraryContext();
+            m_DatabaseName = databaseFileName; 
+            LibraryContext context = new LibraryContext(m_DatabaseName);
             context.Cleanup(); 
             context.Database.Migrate();
+            m_Initialized = true; 
         }
 
         // Parses the operation string and performs commands based upon the command structure
@@ -87,7 +97,7 @@ namespace MoleculeSoftware.Packages.State
 
         private bool UpdateData(string key, string value)
         {
-            using (LibraryContext context = new LibraryContext())
+            using (LibraryContext context = new LibraryContext(m_DatabaseName))
             {
                 using (IDbContextTransaction transaction = context.Database.BeginTransaction())
                 {
@@ -114,7 +124,7 @@ namespace MoleculeSoftware.Packages.State
         {
             try
             {
-                using (LibraryContext context = new LibraryContext())
+                using (LibraryContext context = new LibraryContext(m_DatabaseName))
                 {
                     using (IDbContextTransaction transaction = context.Database.BeginTransaction())
                     {
@@ -143,7 +153,7 @@ namespace MoleculeSoftware.Packages.State
                 return false; 
             }
 
-            using (LibraryContext context = new LibraryContext())
+            using (LibraryContext context = new LibraryContext(m_DatabaseName))
             {
                 using (IDbContextTransaction transaction = context.Database.BeginTransaction())
                 {
@@ -175,7 +185,7 @@ namespace MoleculeSoftware.Packages.State
                 return "#NONE#"; 
             }
 
-            using (LibraryContext context = new LibraryContext())
+            using (LibraryContext context = new LibraryContext(m_DatabaseName))
             {
                 var result = context.CacheItems.FirstOrDefault(c => c.Key == key);
                 if (result is null)
@@ -190,7 +200,7 @@ namespace MoleculeSoftware.Packages.State
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
                 return false; 
 
-            using (LibraryContext context = new LibraryContext())
+            using (LibraryContext context = new LibraryContext(m_DatabaseName))
             {
                 using (IDbContextTransaction transaction = context.Database.BeginTransaction())
                 {

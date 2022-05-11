@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <AssemblyVersion>1.0.0.17</AssemblyVersion>
+    <AssemblyVersion>1.0.0.21</AssemblyVersion>
     <Description>Simple state storage for MoleculeSoftware applications. Note: While this package is available for public use, it is designed for a specific use case within MoleculeSoftware applications. See github listing for documentation</Description>
     <Copyright>2021 Molecule Software Solutions</Copyright>
-    <PackageReleaseNotes>Fixed purge verifier</PackageReleaseNotes>
-    <Version>1.0.2</Version>
+    <PackageReleaseNotes>Added the ability for the developer to specify the database name. NOTE: This is set as a default parameter in the Init method. Added an init check when attempting to perform any database operation.</PackageReleaseNotes>
+    <Version>1.0.4</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RepositoryUrl>github.com/joshman1019/MoleculeSoftware.Packages.State</RepositoryUrl>
   </PropertyGroup>

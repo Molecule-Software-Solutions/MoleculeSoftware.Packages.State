@@ -7,9 +7,9 @@ namespace MoleculeSoftware.Packages.State
     {
         public string DataSource { get; init; }
 
-        public LibraryContext()
+        public LibraryContext(string databaseFileName)
         {
-            DataSource = System.IO.Path.Join(System.IO.Path.GetTempPath(), "MoleculeStateData.db"); 
+            DataSource = System.IO.Path.Join(System.IO.Path.GetTempPath(), databaseFileName); 
         }
 
         // Database Sets
