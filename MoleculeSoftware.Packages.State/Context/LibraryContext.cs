@@ -1,40 +1,39 @@
-﻿using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
+﻿using Realms;
 
 namespace MoleculeSoftware.Packages.State
 {
-    internal class LibraryContext : DbContext
+    internal static class LibraryContext
     {
-        public string DataSource { get; init; }
+        public static string Path { get; private set; }
 
-        public LibraryContext(string databaseFileName)
+        public static void Init(string databasePath)
         {
-            DataSource = System.IO.Path.Join(System.IO.Path.GetTempPath(), databaseFileName); 
+            Path = databasePath; 
         }
 
-        // Database Sets
-        internal DbSet<CacheItem> CacheItems { get; set; }
-
-        // Context
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public static Realm GetApplicationRealm()
         {
-            SqliteConnectionStringBuilder csbuilder = new SqliteConnectionStringBuilder();
-            csbuilder.DataSource = DataSource;
-            csbuilder.ForeignKeys = true; 
-            optionsBuilder.UseSqlite(csbuilder.ConnectionString); 
+            if(string.IsNullOrWhiteSpace(Path))
+            {
+                throw new System.Exception("You have not initialized the database path properly"); 
+            }
+
+            // Note - default behavior is such that, if the file does not exist, then the file will be created
+            // there is no need to determine if the file exists, or to create it, ahead of time
+
+            return Realm.GetInstance(new ContextConfiguration(Path));
         }
 
         /// <summary>
         /// Removes an existing database file - Run this before executing the first migration
         /// </summary>
-        public void Cleanup()
+        public static void Cleanup()
         {
             try
             {
-                if (System.IO.File.Exists(DataSource))
+                if (System.IO.File.Exists(Path))
                 {
-                    System.IO.File.Delete(DataSource);
+                    System.IO.File.Delete(Path);
                 }
             }
             catch (System.Exception ex)
