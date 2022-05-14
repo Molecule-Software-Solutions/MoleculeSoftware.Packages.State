@@ -4,7 +4,7 @@
 
 ### What is State
 
-State is a simple and robust caching system for MoleculeSoftware software packages. It utilizes a SQLite database to create a pseudo NO-SQL data store which accepts simple commands to perform storage, update, delete, retrieval, and purge operations.  
+State is a simple and robust caching system for MoleculeSoftware software packages. It utilizes a Realm database to create a pseudo NO-SQL data store which accepts simple commands to perform storage, update, delete, retrieval, and purge operations.  
 
 ### Commands 
 
@@ -110,9 +110,9 @@ Install the nuget package MoleculeSoftware.Packages.State
 
 When your application that will be using State has started, create a MoleculeState object and call the Init() method. This will delete any existing state database and will perform any migrations that are necessary to set up the database file. The database file is stored in the temporary directory using the name MoelculeStateData.db
 
-NOTE: If Init() is not called the database will not be created. 
+NOTE: If Init(databasePath) is not called the database will not be created. 
 
-NOTE: If Init() is called elsewhere, the state database will be deleted and recreated. This is not recommended to be used as a purge since database migrations must be applied every time it is called. Although it will work, this can be slower than using the inbuilt PURGE#> command. 
+NOTE: If Init(databasePath) is called elsewhere, the state database will be deleted and recreated. This is not recommended to be used as a purge since database migrations must be applied every time it is called. Although it will work, this can be slower than using the inbuilt PURGE#> command. 
 
 ## Using State
 
