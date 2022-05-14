@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,8 +6,7 @@ namespace MoleculeSoftware.Packages.State
 {
     public class MoleculeState
     {
-        private const string DEFAULT_DATABASE_NAME = "MoleculeStateData.db";
-        private string m_DatabaseName = string.Empty; 
+        private string m_DatabasePath; 
         private bool m_Initialized; 
 
         public string DatabaseOperation(string operationString)
@@ -19,17 +16,17 @@ namespace MoleculeSoftware.Packages.State
             return ParseOperationString(operationString);
         }
 
+
         /// <summary>
         /// Initializes the database and ensures that any migrations are performed
         /// NOTE: Deletes all previous instances of the caching database matching the <see cref="databaseFileName"/>
         /// </summary>
-        /// <param name="databaseFileName"></param>
-        public void Init(string databaseFileName = DEFAULT_DATABASE_NAME)
+        /// <param name="databasePath"></param>
+        public void Init(string databasePath)
         {
-            m_DatabaseName = databaseFileName; 
-            LibraryContext context = new LibraryContext(m_DatabaseName);
-            context.Cleanup(); 
-            context.Database.Migrate();
+            m_DatabasePath = databasePath;
+            LibraryContext.Init(m_DatabasePath); 
+            LibraryContext.Cleanup(); 
             m_Initialized = true; 
         }
 
@@ -97,51 +94,45 @@ namespace MoleculeSoftware.Packages.State
 
         private bool UpdateData(string key, string value)
         {
-            using (LibraryContext context = new LibraryContext(m_DatabaseName))
+            var context = LibraryContext.GetApplicationRealm(); 
+
+            try
             {
-                using (IDbContextTransaction transaction = context.Database.BeginTransaction())
+                var searchResult = context.All<CacheItem>().FirstOrDefault(c => c.Key == key);
+                if (searchResult is null)
+                    return false;
+                context.Write(() =>
                 {
-                    try
-                    {
-                        var searchResult = context.CacheItems.FirstOrDefault(c => c.Key == key);
-                        if (searchResult is null)
-                            return false;
-                        searchResult.Value = value;
-                        context.Entry(searchResult).State = EntityState.Modified;
-                        context.SaveChanges();
-                        transaction.Commit();
-                        return true; 
-                    }
-                    catch (Exception)
-                    {
-                        return false; 
-                    }
-                }
+                    searchResult.Value = value;
+                }); 
+                return true; 
+            }
+            catch (Exception)
+            {
+                return false; 
             }
         }
 
         private bool PurgeData()
         {
+            var context = LibraryContext.GetApplicationRealm();
+
             try
             {
-                using (LibraryContext context = new LibraryContext(m_DatabaseName))
+                List<CacheItem> itemsList = new List<CacheItem>(context.All<CacheItem>());
+                context.Write(() =>
                 {
-                    using (IDbContextTransaction transaction = context.Database.BeginTransaction())
+                    foreach (CacheItem item in itemsList)
                     {
-                        List<CacheItem> itemsList = new List<CacheItem>(context.CacheItems);
-                        foreach (CacheItem item in itemsList)
-                        {
-                            context.Remove(item);
-                        }
-                        context.SaveChanges();
-                        transaction.Commit();
-                        return true;
+                        context.Remove(item);
                     }
-                }
+                }); 
+                return true;
+
             }
             catch (Exception)
             {
-                return false;
+                return false; 
             }
         }
 
@@ -153,27 +144,23 @@ namespace MoleculeSoftware.Packages.State
                 return false; 
             }
 
-            using (LibraryContext context = new LibraryContext(m_DatabaseName))
-            {
-                using (IDbContextTransaction transaction = context.Database.BeginTransaction())
-                {
-                    try
-                    {
-                        var result = context.CacheItems.FirstOrDefault(c => c.Key == key);
-                        if (result is null)
-                            return false;
+            var context = LibraryContext.GetApplicationRealm();
 
-                        context.Remove(result);
-                        context.SaveChanges();
-                        transaction.Commit(); 
-                        return true;
-                    }
-                    catch (Exception)
-                    {
-                        transaction.Rollback();
-                        return false;
-                    }
-                }
+            try
+            {
+                var result = context.All<CacheItem>().FirstOrDefault(c => c.Key == key);
+                if (result is null)
+                    return false;
+
+                context.Write(() =>
+                {
+                    context.Remove(result);
+                }); 
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
 
@@ -185,42 +172,39 @@ namespace MoleculeSoftware.Packages.State
                 return "#NONE#"; 
             }
 
-            using (LibraryContext context = new LibraryContext(m_DatabaseName))
+            var context = LibraryContext.GetApplicationRealm();
+
+            try
             {
-                var result = context.CacheItems.FirstOrDefault(c => c.Key == key);
+                var result = context.All<CacheItem>().FirstOrDefault(c => c.Key == key);
                 if (result is null)
                     return "#NONE#";
                 else return result.Value; 
             }
+            catch (Exception) { return "#NONE#"; }
         }
 
         private bool StoreValue(string key, string value)
         {
             // Guard
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
-                return false; 
+                return false;
+            var realm = LibraryContext.GetApplicationRealm();
 
-            using (LibraryContext context = new LibraryContext(m_DatabaseName))
+            var context = LibraryContext.GetApplicationRealm(); 
+
+            try
             {
-                using (IDbContextTransaction transaction = context.Database.BeginTransaction())
+                context.Add(new CacheItem()
                 {
-                    try
-                    {
-                        context.Add(new CacheItem()
-                        {
-                            Key = key,
-                            Value = value
-                        });
-                        context.SaveChanges(); 
-                        transaction.Commit();
-                        return true;
-                    }
-                    catch (Exception)
-                    {
-                        transaction.Rollback();
-                        return false; 
-                    }
-                }
+                    Key = key,
+                    Value = value
+                });
+                return true;
+            }
+            catch (Exception)
+            {
+                return false; 
             }
         }
     }
