@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Realms;
+using MongoDB.Bson; 
 
 namespace MoleculeSoftware.Packages.State
 {
-    public class CacheItem
+    public class CacheItem : RealmObject
     {
-        [Key]
+        [PrimaryKey]
         public int ID { get; set; }
         [Required]
         public string Key { get; set; }
