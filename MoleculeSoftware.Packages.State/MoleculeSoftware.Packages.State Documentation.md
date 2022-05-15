@@ -42,8 +42,8 @@ The initiator will be combined with a command parameter as follows:
 Value parameters follow the command parameter and will contain the value that you want to store/update
 Only the STORE and UPDATE commands require a value parameter
 
-STORE#>KEY_NAME#>VALUE
-UPDATE#>KEY_NAME#>VALUE
+* STORE#>KEY_NAME#>VALUE
+* UPDATE#>KEY_NAME#>VALUE
 
 VALUE = String representation of the value you wish to store
 
