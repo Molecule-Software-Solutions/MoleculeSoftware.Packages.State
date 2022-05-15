@@ -89,6 +89,7 @@ namespace MoleculeSoftware.Packages.State
             catch (Exception)
             {
                 return "#NONE#";
+                throw; 
             }
         }
 
@@ -109,7 +110,8 @@ namespace MoleculeSoftware.Packages.State
             }
             catch (Exception)
             {
-                return false; 
+                return false;
+                throw; 
             }
         }
 
@@ -132,7 +134,8 @@ namespace MoleculeSoftware.Packages.State
             }
             catch (Exception)
             {
-                return false; 
+                return false;
+                throw; 
             }
         }
 
@@ -161,6 +164,7 @@ namespace MoleculeSoftware.Packages.State
             catch (Exception)
             {
                 return false;
+                throw; 
             }
         }
 
@@ -181,7 +185,11 @@ namespace MoleculeSoftware.Packages.State
                     return "#NONE#";
                 else return result.Value; 
             }
-            catch (Exception) { return "#NONE#"; }
+            catch (Exception) 
+            { 
+                return "#NONE#";
+                throw; 
+            }
         }
 
         private bool StoreValue(string key, string value)
@@ -189,22 +197,24 @@ namespace MoleculeSoftware.Packages.State
             // Guard
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
                 return false;
-            var realm = LibraryContext.GetApplicationRealm();
-
             var context = LibraryContext.GetApplicationRealm(); 
 
             try
             {
-                context.Add(new CacheItem()
+                context.Write(() =>
                 {
-                    Key = key,
-                    Value = value
+                    context.Add(new CacheItem()
+                    {
+                        Key = key,
+                        Value = value
+                    });
                 });
                 return true;
             }
             catch (Exception)
             {
-                return false; 
+                return false;
+                throw; 
             }
         }
     }

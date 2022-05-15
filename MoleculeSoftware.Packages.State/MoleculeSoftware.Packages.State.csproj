@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <AssemblyVersion>2.0.0</AssemblyVersion>
+    <AssemblyVersion>2.0.1</AssemblyVersion>
     <Description>Simple state storage for MoleculeSoftware applications. Note: While this package is available for public use, it is designed for a specific use case within MoleculeSoftware applications. See github listing for documentation</Description>
     <Copyright>2022 Molecule Software Solutions</Copyright>
-    <PackageReleaseNotes>Added the ability for the developer to specify the database name. NOTE: This is set as a default parameter in the Init method. Added an init check when attempting to perform any database operation.</PackageReleaseNotes>
-    <Version>2.0.0</Version>
+    <PackageReleaseNotes>Corrected realm storage error under certain circumstances.</PackageReleaseNotes>
+    <Version>2.0.1</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RepositoryUrl>github.com/joshman1019/MoleculeSoftware.Packages.State</RepositoryUrl>
   </PropertyGroup>
